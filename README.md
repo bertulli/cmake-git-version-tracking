@@ -45,21 +45,21 @@ This CMake module exports both a C and a C++ API. Both are accessed by including
 call after including the module.
 
 | Description | C API | C++ API[^1] | Output | Git command |
-| ----------- | ----- | ---------- | ------ | ----------- |
-| Check if repo is correctly configured | `bool git_IsPopulated()` | `bool git::IsPopulated()` | `true`/`false` | (Set to `0` if git commands signal an error) |
-| Check if the worktree is dirty (there are uncommited changes)[^2] | `bool git_AnyUncommittedChanges()` | `bool git::AnyUncommittedChanges()` | `true`/`false` | `git status --porcelain -unormal` |
-| Get the author's name | <pre>const char* git_AuthorName()</pre> | `const StringOrView& git::AuthorName()` | `"Andrew Hardin"` | `git show -s "--format=%an"` |
-| Get the author's email | <code>const char* git_AuthorEmail()</code> | `const StringOrView& git::AuthorEmail()` | `"andrew.hardin@github.com"` | `git show -s "--format=%ae"` |
-| Get the commit full SHA1 ID | <pre><code>const char* git_CommitSHA1()</code></pre> | `const StringOrView& git::CommitSHA1()` | `"815da8c5a326f10931c0ce5944c62da11bbe784e"` | `git show -s "--format=%H"` |
-| Get the commit date | <code><pre>const char* git_CommitDate()</pre></code> | `const StringOrView& git::CommitDate()` | `"2025-11-05 17:01:07 +0100"` | `git show -s "--format=%ci"` |
-| Get the commit subject | `const char* git_CommitSubject()` | `const StringOrView& git::CommitSubject()` | `"An example commit subject"` | `git show -s "--format=%s"` |
-| Get the commit full body | `const char* git_CommitBody()` | `const StringOrView& git::CommitBody()` | `"An example commit body\nthat can span multiple lines"`[^3] | `git show -s "--format=%b"` |
-| Get the commit describe string | `const char* git_Describe()` | `const StringOrView& git::Describe()` | `"v1.0.2-5g815da8c"` | `git describe --always` |
-| Get the current branch | `const char* git_Branch()` | `const StringOrView& git::Branch()` | `"main"` | `git symbolic-ref --short -q` |
+| ----------- | ----- | ----------- | ------ | ----------- |
+| Check if repo is correctly configured | <pre>bool git_IsPopulated()</pre> | <pre>bool git::IsPopulated()</pre> | `true`/`false` | (Set to `0` if git commands signal an error) |
+| Check if the worktree is dirty (there are uncommited changes)[^2] | <pre>bool git_AnyUncommittedChanges()</pre> | <pre>bool git::AnyUncommittedChanges()</pre> | `true`/`false` | <pre>git status --porcelain -unormal</pre> |
+| Get the author's name | <pre>const char* git_AuthorName()</pre> | <pre>const StringOrView& git::AuthorName()</pre> | `"Andrew Hardin"` | <pre>git show -s "--format=%an"</pre> |
+| Get the author's email | <pre>const char* git_AuthorEmail()</pre> | <pre>const StringOrView& git::AuthorEmail()</pre> | `"name.surname@github.com"` | <pre>git show -s "--format=%ae"</pre> |
+| Get the commit full SHA1 ID | <pre>const char* git_CommitSHA1()</pre> | <pre>const StringOrView& git::CommitSHA1()</pre> | `"815da8c5a326f10931c0ce5944c62da11bbe784e"` | <pre>git show -s "--format=%H"</pre> |
+| Get the commit date | <pre>const char* git_CommitDate()</pre> | <pre>const StringOrView& git::CommitDate()</pre> | `"2025-11-05 17:01:07 +0100"` | <pre>git show -s "--format=%ci"</pre> |
+| Get the commit subject | <pre>const char* git_CommitSubject()</pre> | <pre>const StringOrView& git::CommitSubject()</pre> | `"An example commit subject"` | <pre>git show -s "--format=%s"</pre> |
+| Get the commit full body | <pre>const char* git_CommitBody()</pre> | <pre>const StringOrView& git::CommitBody()</pre> | `"An example commit body\nthat can span multiple lines"`[^3] | <pre>git show -s "--format=%b"</pre> |
+| Get the commit describe string | <pre>const char* git_Describe()</pre> | <pre>const StringOrView& git::Describe()</pre> | `"v1.0.2-5g815da8c"` | <pre>git describe --always</pre> |
+| Get the current branch | <pre>const char* git_Branch()</pre> | <pre>const StringOrView& git::Branch()</pre> | `"main"` | <pre>git symbolic-ref --short -q</pre> |
 
 [^1]: The `StringOrView` type is an alias to `std::string`. By setting the configuration variable `GIT_VERSION_USE_STRING_VIEW` to true, it becomes an alias to `std::string_view`.
 [^2]: By default, it considers untracked files as a dirty worktree. By setting the configuration variable `GIT_IGNORE_UNTRACKED` to true, it ignores them and only considers tracked modified files.
-[^3]: The returned string has whitespace automatically escaped (it will contain printable sequences `"\n"` and `"\r"`)
+[^3]: The returned string has the same whitespace as the original body (it will contain newlines)
 
 ## Q: What if I want to track `$special_git_field`?
 Fork the project and modify [git_watcher.cmake](git_watcher.cmake)
