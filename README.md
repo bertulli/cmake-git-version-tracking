@@ -24,7 +24,7 @@ target_link_libraries(your_target
   cmake_git_version_tracking
 )
 ```
-Then [`#include git.h`](./git.h) and use the provided functions to retrieve git metadata.
+Then [`#include "git.h"`](./git.h) and use the provided functions to retrieve git metadata.
 
 ## Intended use case
 You're continuously shipping prebuilt binaries for an
@@ -39,6 +39,27 @@ Dirty: false (there were no uncommitted changes at time of build)
 
 This allows you to investigate the _precise_ version of the
 application that the bug was reported in.
+
+## API reference
+This CMake module exports both a C and a C++ API. Both are accessed by including ["git.h"](./git.h).  Here is the list of functions you can
+call after including the module.
+
+| Description | C API | C++ API[^1] | Output | Git command |
+| ----------- | ----- | ---------- | ------ | ----------- |
+| Check if repo is correctly configured | `bool git_IsPopulated()` | `bool git::IsPopulated()` | `true`/`false` | (Set to `0` if git commands signal an error) |
+| Check if the worktree is dirty (there are uncommited changes)[^2] | `bool git_AnyUncommittedChanges()` | `bool git::AnyUncommittedChanges()` | `true`/`false` | `git status --porcelain -unormal` |
+| Get the author's name | <pre>const char* git_AuthorName()</pre> | `const StringOrView& git::AuthorName()` | `"Andrew Hardin"` | `git show -s "--format=%an"` |
+| Get the author's email | <code>const char* git_AuthorEmail()</code> | `const StringOrView& git::AuthorEmail()` | `"andrew.hardin@github.com"` | `git show -s "--format=%ae"` |
+| Get the commit full SHA1 ID | <pre><code>const char* git_CommitSHA1()</code></pre> | `const StringOrView& git::CommitSHA1()` | `"815da8c5a326f10931c0ce5944c62da11bbe784e"` | `git show -s "--format=%H"` |
+| Get the commit date | <code><pre>const char* git_CommitDate()</pre></code> | `const StringOrView& git::CommitDate()` | `"2025-11-05 17:01:07 +0100"` | `git show -s "--format=%ci"` |
+| Get the commit subject | `const char* git_CommitSubject()` | `const StringOrView& git::CommitSubject()` | `"An example commit subject"` | `git show -s "--format=%s"` |
+| Get the commit full body | `const char* git_CommitBody()` | `const StringOrView& git::CommitBody()` | `"An example commit body\nthat can span multiple lines"`[^3] | `git show -s "--format=%b"` |
+| Get the commit describe string | `const char* git_Describe()` | `const StringOrView& git::Describe()` | `"v1.0.2-5g815da8c"` | `git describe --always` |
+| Get the current branch | `const char* git_Branch()` | `const StringOrView& git::Branch()` | `"main"` | `git symbolic-ref --short -q` |
+
+[^1]: The `StringOrView` type is an alias to `std::string`. By setting the configuration variable `GIT_VERSION_USE_STRING_VIEW` to true, it becomes an alias to `std::string_view`.
+[^2]: By default, it considers untracked files as a dirty worktree. By setting the configuration variable `GIT_IGNORE_UNTRACKED` to true, it ignores them and only considers tracked modified files.
+[^3]: The returned string has whitespace automatically escaped (it will contain printable sequences `"\n"` and `"\r"`)
 
 ## Q: What if I want to track `$special_git_field`?
 Fork the project and modify [git_watcher.cmake](git_watcher.cmake)
