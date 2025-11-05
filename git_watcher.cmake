@@ -105,6 +105,7 @@ set(_state_variable_names
     GIT_COMMIT_BODY
     GIT_DESCRIBE
     GIT_BRANCH
+    GIT_SHORT
     # >>>
     # 1. Add the name of the additional git variable you're interested in monitoring
     #    to this list.
@@ -240,6 +241,14 @@ function(GetGitState _working_dir)
         set(ENV{GIT_BRANCH} "${object}")
     else()
         set(ENV{GIT_BRANCH} "${output}")
+    endif()
+
+    # Get output of git describe
+    RunGitCommand(rev-parse --short ${object})
+    if(NOT exit_code EQUAL 0)
+        set(ENV{GIT_SHORT} "unknown")
+    else()
+        set(ENV{GIT_SHORT} "${output}")
     endif()
 
     # >>>
